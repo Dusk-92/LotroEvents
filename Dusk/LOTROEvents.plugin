@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Information>
+        <Name>LOTROEvents</Name>
+        <Author>Dusk</Author>
+        <Version>0.11.19</Version>
+        <Description>LOTRO event list, calendar and optional active-event chat announcements / Liste, calendrier et annonces des événements actifs / Ereignisliste, Kalender und optionale Chat-Ankündigungen.</Description>
+    </Information>
+    <Package>Dusk.LOTROEvents.Main</Package>
+    <Configuration Apartment="LOTROEvents" />
+</Plugin>
