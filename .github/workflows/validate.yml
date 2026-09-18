@@ -14,5 +14,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Lua 5.1
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.1
+
+      - name: Check Lua syntax
+        run: |
+          luac5.1 -p Dusk/LOTROEvents/Main.lua
+          luac5.1 -p Dusk/LOTROEvents/Time.lua
+          luac5.1 -p Dusk/LOTROEvents/Localization.lua
+          luac5.1 -p Dusk/LOTROEvents/Calendar.lua
+
       - name: Validate calendar and release data
         run: python3 tools/validate_calendar.py
