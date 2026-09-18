@@ -37,7 +37,8 @@ local NOTICE_COLOR = "8CC6FF";
 local CELL_BORDER_COLOR = Turbine.UI.Color(1.0, 0.35, 0.35, 0.35);
 local CELL_BACK_COLOR = Turbine.UI.Color(0.92, 0.02, 0.02, 0.02);
 local CELL_OTHER_MONTH_BACK_COLOR = Turbine.UI.Color(0.92, 0.01, 0.01, 0.01);
-local CELL_TODAY_BORDER_COLOR = Turbine.UI.Color(1.0, 0.95, 0.72, 0.18);\nlocal CELL_TODAY_BACK_COLOR = Turbine.UI.Color(0.20, 0.95, 0.72, 0.18);
+local CELL_TODAY_BORDER_COLOR = Turbine.UI.Color(1.0, 0.95, 0.72, 0.18);
+local CELL_TODAY_BACK_COLOR = Turbine.UI.Color(0.20, 0.95, 0.72, 0.18);
 local PANEL_BACK_COLOR = Turbine.UI.Color(1.0, 0.00, 0.00, 0.00);
 
 local function GetClientLanguage()
