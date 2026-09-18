@@ -1,4 +1,4 @@
-LOTRO Events 0.11.19
+LOTRO Events 0.11.20
 ====================
 Auteur / Author: Dusk
 
@@ -127,7 +127,17 @@ ganzes Jahr verfügbar ist und kein wiederkehrendes öffentliches Event darstell
 
 
 
+CHANGES 0.11.20
+================
+- List view now refreshes its active/upcoming state and remaining-time labels every 60 seconds while the window is visible.
+- Calendar rendering is now on-demand: hidden views are no longer rebuilt unnecessarily, and an open calendar only redraws automatically when the local calendar day changes.
+- The launcher icon now stays at full opacity at rest instead of dropping to 92% after mouse-over.
+- Added a localized warning when the embedded schedule has 30 days or less of known coverage remaining, plus a stronger warning after it expires.
+- Added repository-side validation for calendar keys, duplicate entries, date ordering, localization parity, and release-version consistency.
+- Added a root GitHub README and documented the current settings schema version (12).
+
 CHANGES 0.11.19
+===============
 - Main window and launcher now use the normal UI layer so native LOTRO panels (including the world map) can appear above them.
 
 CHANGES 0.11.18
@@ -419,7 +429,12 @@ Standing Stone Games may change schedule dates. Calendar.lua is intentionally
 kept simple so those corrections can be made quickly.
 
 The launcher icon is event-driven and does not keep a permanent OnUpdate loop.
+While the LOTRO Events window is visible, the window uses a lightweight update callback gated to one refresh check per 60 seconds so list countdowns stay current; it is disabled again as soon as the window closes.
 The event window still never opens automatically. A short temporary startup delay is used only for the optional active-event chat announcement.
+
+Settings schema
+---------------
+Current settings schema version: 12.
 
 Calendar source
 ---------------

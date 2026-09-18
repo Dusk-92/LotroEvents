@@ -84,6 +84,8 @@ DuskLOTROEvents.Localization = {
         commandEventsUnavailable = "/events is already used by another plugin; use /lotroevents for LOTRO Events.",
         commandUnavailable = "Both /events and /lotroevents are already used by another plugin.",
         displaySizeListenerFailed = "Display-resolution monitoring could not be initialized; automatic UI repositioning after a resolution change is disabled.",
+        calendarCoverageExpiring = "The embedded event calendar will soon need an update; its latest known entry ends on %s.",
+        calendarCoverageExpired = "The embedded event calendar is out of date; its latest known entry ended on %s.",
         daysWord = "days",
     },
 
@@ -166,6 +168,8 @@ DuskLOTROEvents.Localization = {
         commandEventsUnavailable = "/events est déjà utilisé par un autre plugin ; utilise /lotroevents pour LOTRO Events.",
         commandUnavailable = "/events et /lotroevents sont déjà utilisés par un autre plugin.",
         displaySizeListenerFailed = "Impossible d'initialiser la surveillance des changements de résolution ; le repositionnement automatique de l'interface après un changement de résolution est désactivé.",
+        calendarCoverageExpiring = "Le calendrier intégré devra bientôt être mis à jour ; sa dernière entrée connue se termine le %s.",
+        calendarCoverageExpired = "Le calendrier intégré n'est plus à jour ; sa dernière entrée connue s'est terminée le %s.",
         daysWord = "jours",
     },
 
@@ -248,6 +252,8 @@ DuskLOTROEvents.Localization = {
         commandEventsUnavailable = "/events wird bereits von einem anderen Plugin verwendet; nutze /lotroevents für LOTRO Events.",
         commandUnavailable = "/events und /lotroevents werden bereits von einem anderen Plugin verwendet.",
         displaySizeListenerFailed = "Die Überwachung von Auflösungsänderungen konnte nicht initialisiert werden; die automatische UI-Neupositionierung nach einem Auflösungswechsel ist deaktiviert.",
+        calendarCoverageExpiring = "Der integrierte Ereigniskalender muss bald aktualisiert werden; der letzte bekannte Eintrag endet am %s.",
+        calendarCoverageExpired = "Der integrierte Ereigniskalender ist veraltet; der letzte bekannte Eintrag endete am %s.",
         daysWord = "Tage",
     },
 };
