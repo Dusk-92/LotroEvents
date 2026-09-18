@@ -37,7 +37,7 @@ local NOTICE_COLOR = "8CC6FF";
 local CELL_BORDER_COLOR = Turbine.UI.Color(1.0, 0.35, 0.35, 0.35);
 local CELL_BACK_COLOR = Turbine.UI.Color(0.92, 0.02, 0.02, 0.02);
 local CELL_OTHER_MONTH_BACK_COLOR = Turbine.UI.Color(0.92, 0.01, 0.01, 0.01);
-local CELL_TODAY_BORDER_COLOR = Turbine.UI.Color(1.0, 0.72, 0.58, 0.22);
+local CELL_TODAY_BORDER_COLOR = Turbine.UI.Color(1.0, 0.95, 0.72, 0.18);\nlocal CELL_TODAY_BACK_COLOR = Turbine.UI.Color(0.20, 0.95, 0.72, 0.18);
 local PANEL_BACK_COLOR = Turbine.UI.Color(1.0, 0.00, 0.00, 0.00);
 
 local function GetClientLanguage()
@@ -1036,9 +1036,14 @@ RefreshCalendarContent = function()
 
             local fill = TrackCalendarControl(Turbine.UI.Control());
             fill:SetParent(border);
-            fill:SetPosition(1, 1);
-            fill:SetSize(width - 2, height - 2);
-            fill:SetBackColor(isCurrentMonth and CELL_BACK_COLOR or CELL_OTHER_MONTH_BACK_COLOR);
+            local borderInset = isToday and 2 or 1;
+            fill:SetPosition(borderInset, borderInset);
+            fill:SetSize(width - (borderInset * 2), height - (borderInset * 2));
+            if (isToday) then
+                fill:SetBackColor(CELL_TODAY_BACK_COLOR);
+            else
+                fill:SetBackColor(isCurrentMonth and CELL_BACK_COLOR or CELL_OTHER_MONTH_BACK_COLOR);
+            end
             fill:SetMouseVisible(false);
 
             if (isCurrentMonth) then
