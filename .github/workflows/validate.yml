@@ -1,0 +1,18 @@
+name: Validate LOTRO Events
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate calendar and release data
+        run: python3 tools/validate_calendar.py
