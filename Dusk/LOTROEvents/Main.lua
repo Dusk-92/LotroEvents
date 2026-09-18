@@ -15,6 +15,8 @@ local LAUNCHER_RESOURCE = "Dusk/LOTROEvents/Resources/LOTROEvents.tga";
 local GEAR_RESOURCE = "Dusk/LOTROEvents/Resources/Gear.tga";
 local LONG_EVENT_DAYS = 30;
 local CHAT_ANNOUNCE_DELAY = 5;
+local WINDOW_REFRESH_SECONDS = 60;
+local CALENDAR_COVERAGE_WARNING_DAYS = 30;
 
 local WINDOW_NORMAL_WIDTH = 820;
 local WINDOW_NORMAL_HEIGHT = 700;
@@ -606,6 +608,8 @@ local currentView = "list";
 local currentCalendarYear = nil;
 local currentCalendarMonth = nil;
 local currentWindowNow = nil;
+local lastCalendarTodayKey = nil;
+local nextWindowRefreshTime = nil;
 
 local function ClearCalendarControls()
     for _, control in ipairs(calendarDynamicControls) do
@@ -1005,6 +1009,7 @@ RefreshCalendarContent = function()
     );
     local daysInMonth = GetDaysInMonth(currentCalendarYear, currentCalendarMonth);
     local todayYear, todayMonth, todayDay = Time.GetDateParts(currentWindowNow or GetNow(), GetDisplayZone());
+    lastCalendarTodayKey = DateKey(todayYear, todayMonth, todayDay);
 
     -- Draw the month grid first. Leading/trailing cells intentionally stay blank,
     -- matching the compact LOTRO calendar layout used as the visual reference.
@@ -1131,8 +1136,14 @@ RefreshCalendarContent = function()
 end
 
 local function RefreshWindowContent()
-    RefreshListContent();
-    RefreshCalendarContent();
+    -- Rebuild only the visible view. The hidden view is refreshed on demand when
+    -- the user switches to it, which avoids recreating the full calendar while
+    -- only the list or options page is being used.
+    if (currentView == "list") then
+        RefreshListContent();
+    elseif (currentView == "calendar") then
+        RefreshCalendarContent();
+    end
     UpdateViewVisibility();
 end
 
@@ -1686,10 +1697,51 @@ local function CreateWindow()
             settings.windowY = eventWindow:GetTop();
             SaveSettings();
         end
+        eventWindow:SetWantsUpdates(false);
+        nextWindowRefreshTime = nil;
         eventWindow:SetVisible(false);
     end
 
     eventWindow:SetWantsKeyEvents(true);
+    eventWindow:SetWantsUpdates(false);
+
+    eventWindow.Update = function(sender, args)
+        local gameTime = Turbine.Engine.GetGameTime();
+
+        if (nextWindowRefreshTime == nil) then
+            nextWindowRefreshTime = gameTime + WINDOW_REFRESH_SECONDS;
+            return;
+        end
+
+        if (gameTime < nextWindowRefreshTime) then
+            return;
+        end
+
+        nextWindowRefreshTime = gameTime + WINDOW_REFRESH_SECONDS;
+
+        if (not sender:IsVisible()) then
+            sender:SetWantsUpdates(false);
+            nextWindowRefreshTime = nil;
+            return;
+        end
+
+        currentWindowNow = GetNow();
+
+        if (currentView == "list") then
+            -- Remaining-time labels and active/upcoming state stay current while
+            -- the list remains open.
+            RefreshListContent();
+        elseif (currentView == "calendar") then
+            -- The calendar itself is static inside a day. Rebuild it only when
+            -- the displayed "today" date actually changes.
+            local year, month, day = Time.GetDateParts(currentWindowNow, GetDisplayZone());
+            local todayKey = DateKey(year, month, day);
+            if (todayKey ~= lastCalendarTodayKey) then
+                RefreshCalendarContent();
+            end
+        end
+    end
+
     eventWindow.KeyDown = function(sender, args)
         if (args.Action == Turbine.UI.Lotro.Action.Escape) then
             if (settings.rememberWindowPosition) then
@@ -1697,6 +1749,8 @@ local function CreateWindow()
                 settings.windowY = sender:GetTop();
                 SaveSettings();
             end
+            sender:SetWantsUpdates(false);
+            nextWindowRefreshTime = nil;
             sender:SetVisible(false);
         end
     end
@@ -1717,6 +1771,8 @@ local function CreateWindow()
             SaveSettings();
         end
         args.Cancel = true;
+        sender:SetWantsUpdates(false);
+        nextWindowRefreshTime = nil;
         sender:SetVisible(false);
     end
 end
@@ -1737,6 +1793,8 @@ local function ShowEventWindow(now)
 
     RefreshWindowContent();
     eventWindow:SetVisible(true);
+    nextWindowRefreshTime = Turbine.Engine.GetGameTime() + WINDOW_REFRESH_SECONDS;
+    eventWindow:SetWantsUpdates(true);
 end
 
 DuskLOTROEvents.ShowWindow = function()
@@ -1754,6 +1812,8 @@ RebuildEventWindow = function()
         settings.windowX = eventWindow:GetLeft();
         settings.windowY = eventWindow:GetTop();
     end
+    eventWindow:SetWantsUpdates(false);
+    nextWindowRefreshTime = nil;
     eventWindow:SetVisible(false);
     ClearCalendarControls();
 
@@ -1798,6 +1858,8 @@ local function ToggleEventWindow()
             settings.windowY = eventWindow:GetTop();
             SaveSettings();
         end
+        eventWindow:SetWantsUpdates(false);
+        nextWindowRefreshTime = nil;
         eventWindow:SetVisible(false);
     else
         ShowEventWindow();
@@ -2033,7 +2095,7 @@ local function CreateLauncherIcon()
     end
 
     launcherTrigger.MouseLeave = function(sender, args)
-        launcherWindow:SetOpacity(0.92);
+        launcherWindow:SetOpacity(1.0);
     end
 end
 
@@ -2123,6 +2185,40 @@ chatAnnounceTimer.Update = function(sender, args)
     end
 end
 
+local function GetLatestCalendarEnd()
+    local latest = nil;
+
+    for _, event in ipairs(DuskLOTROEvents.Events) do
+        if (event.ends ~= nil and (latest == nil or event.ends > latest)) then
+            latest = event.ends;
+        end
+    end
+
+    for _, notice in ipairs(DuskLOTROEvents.Notices) do
+        if (notice.ends ~= nil and (latest == nil or notice.ends > latest)) then
+            latest = notice.ends;
+        end
+    end
+
+    return latest;
+end
+
+local function WarnIfCalendarCoverageLow()
+    local latest = GetLatestCalendarEnd();
+    if (latest == nil) then
+        return;
+    end
+
+    local now = GetNow();
+    local formattedEnd = Time.FormatDate(latest, localeKey, GetDisplayZone());
+
+    if (latest <= now) then
+        WriteChatLine(string.format(L.calendarCoverageExpired, formattedEnd));
+    elseif ((latest - now) <= (CALENDAR_COVERAGE_WARNING_DAYS * 86400)) then
+        WriteChatLine(string.format(L.calendarCoverageExpiring, formattedEnd));
+    end
+end
+
 local function StartChatAnnouncement()
     if (settings.chatAnnounceActive ~= true) then
         return;
@@ -2139,6 +2235,7 @@ end
 
 CreateLauncherIcon();
 CreateDisplaySizeListener();
+WarnIfCalendarCoverageLow();
 StartChatAnnouncement();
 
 if (plugin ~= nil) then
@@ -2236,6 +2333,10 @@ if (plugin ~= nil) then
         if (chatAnnounceTimer ~= nil) then
             chatAnnounceTimer:SetWantsUpdates(false);
             chatAnnounceTimer.targetTime = nil;
+        end
+        if (eventWindow ~= nil) then
+            eventWindow:SetWantsUpdates(false);
+            nextWindowRefreshTime = nil;
         end
         if (displaySizeListener ~= nil) then
             pcall(function()
