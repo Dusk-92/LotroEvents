@@ -3,7 +3,7 @@
     <Information>
         <Name>LOTROEvents</Name>
         <Author>Dusk</Author>
-        <Version>0.11.19</Version>
+        <Version>0.11.20</Version>
         <Description>LOTRO event list, calendar and optional active-event chat announcements / Liste, calendrier et annonces des événements actifs / Ereignisliste, Kalender und optionale Chat-Ankündigungen.</Description>
     </Information>
     <Package>Dusk.LOTROEvents.Main</Package>
