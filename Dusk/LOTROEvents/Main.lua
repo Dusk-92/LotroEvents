@@ -38,7 +38,7 @@ local CELL_BORDER_COLOR = Turbine.UI.Color(1.0, 0.35, 0.35, 0.35);
 local CELL_BACK_COLOR = Turbine.UI.Color(0.92, 0.02, 0.02, 0.02);
 local CELL_OTHER_MONTH_BACK_COLOR = Turbine.UI.Color(0.92, 0.01, 0.01, 0.01);
 local CELL_TODAY_BORDER_COLOR = Turbine.UI.Color(1.0, 0.95, 0.72, 0.18);
-local CELL_TODAY_BACK_COLOR = Turbine.UI.Color(0.20, 0.95, 0.72, 0.18);
+local CELL_TODAY_BACK_COLOR = Turbine.UI.Color(1.00, 0.95, 0.72, 0.18);
 local PANEL_BACK_COLOR = Turbine.UI.Color(1.0, 0.00, 0.00, 0.00);
 
 local function GetClientLanguage()
@@ -1593,6 +1593,13 @@ local function CreateWindow()
     calendarButton.Click = function(sender, args)
         SwitchToView("calendar");
     end
+
+    local gearBackground = Turbine.UI.Control();
+    gearBackground:SetParent(bodyBackground);
+    gearBackground:SetSize(28, 28);
+    gearBackground:SetPosition(bodyBackground:GetWidth() - 36, 3);
+    gearBackground:SetBackColor(PANEL_BACK_COLOR);
+    gearBackground:SetMouseVisible(false);
 
     gearButton = Turbine.UI.Button();
     gearButton:SetParent(bodyBackground);
